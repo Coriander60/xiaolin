@@ -1,18 +1,10 @@
 # Redis 常见数据类型和应用场景
 
-大家好，我是小林。
+🚩Redis 常见的数据类型（5+4）：
 
-我们都知道 Redis 提供了丰富的数据类型，常见的有五种：**String（字符串），Hash（哈希），List（列表），Set（集合）、Zset（有序集合）**。
+**String（字符串），Hash（哈希），List（列表），Set（集合）、Zset（有序集合）**。
 
-随着 Redis 版本的更新，后面又支持了四种数据类型： **BitMap（2.2 版新增）、HyperLogLog（2.8 版新增）、GEO（3.2 版新增）、Stream（5.0 版新增）**。
-
-每种数据对象都有各自的应用场景，你能说出它们各自的应用场景吗？
-
-面试过程中，这个问题也很常被问到，又比如会举例一个应用场景来问你，让你说使用哪种 Redis 数据类型来实现。
-
-所以，这次我们就来学习 **Redis 数据类型的使用以及应用场景**。
-
-> PS：你可以自己本机安装 Redis 或者通过 Redis 官网提供的[在线 Redis 环境](https://try.redis.io/) 来敲命令。
+**BitMap（2.2 版新增）、HyperLogLog（2.8 版新增）、GEO（3.2 版新增）、Stream（5.0 版新增）**。
 
 ![](https://cdn.xiaolincoding.com/gh/xiaolincoder/redis/数据类型/redis命令提纲.png)
 
@@ -28,6 +20,15 @@ String 是最基本的 key-value 结构，key 是唯一标识，value 是具体�
 
 String 类型的底层的数据结构实现主要是 int 和 SDS（简单动态字符串）。
 
+```c
+// SDS 头部定义（以 8 位为例）
+struct __attribute__ ((__packed__)) sdshdr8 {
+    uint8_t len;    // 当前已使用的长度
+    uint8_t alloc;  // 总共分配的 buf 长度（不含头部）
+    char buf[];     // 实际保存数据的地方（flexible array）
+};
+```
+
 SDS 和我们认识的 C 字符串不太一样，之所以没有使用 C 语言的字符串表示，因为 SDS 相比于 C 的原生字符串：
 
 - **SDS  不仅可以保存文本数据，还可以保存二进制数据**。因为 `SDS` 使用 `len` 属性的值而不是空字符来判断字符串是否结束，并且 SDS 的所有 API 都会以处理二进制的方式来处理 SDS 存放在 `buf[]` 数组里的数据。所以 SDS 不光能存放文本数据，而且能保存图片、音频、视频、压缩文件这样的二进制数据。
@@ -35,6 +36,15 @@ SDS 和我们认识的 C 字符串不太一样，之所以没有使用 C 语言�
 - **Redis 的 SDS API 是安全的，拼接字符串不会造成缓冲区溢出**。因为 SDS 在拼接字符串之前会检查 SDS 空间是否满足要求，如果空间不够会自动扩容，所以不会导致缓冲区溢出的问题。
 
 字符串对象的内部编码（encoding）有 3 种：**int、raw 和 embstr**。
+```c
+typedef struct redisObject {
+    unsigned type;     // 表示对象的类型，比如 string、list、set
+    unsigned encoding; // 表示对象的内部编码方式，比如 raw、int、embstr
+    void *ptr;         // 指向实际数据（或者直接存放数据的地方）
+} robj;
+
+robj *o;
+```
 
 ![](https://cdn.xiaolincoding.com/gh/xiaolincoder/redis/数据类型/string结构.png)
 
