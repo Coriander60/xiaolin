@@ -70,147 +70,42 @@ HTTP 是超文本传输协议，也就是**H**yper**T**ext **T**ransfer **P**rot
 
 ### 🚩 HTTP 常见字段有哪些？
 
-*Host* 字段
+*Host* 字段：客户端发送请求时，用来指定服务器的域名。
 
-客户端发送请求时，用来指定服务器的域名。
+*Content-Length 字段*：服务器在返回数据时，表明本次回应的数据长度。
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/7-HOST字段.png)
+>大家应该都知道 HTTP 是基于 TCP 传输协议进行通信的，而使用了 TCP 传输协议，就会存在一个“粘包”的问题，**HTTP 协议通过设置回车符、换行符作为 HTTP header 的边界，通过 Content-Length 字段作为 HTTP body 的边界，这两个方式都是为了解决“粘包”的问题**。具体什么是 TCP 粘包，可以看这篇文章：[如何理解是 TCP 面向字节流协议？](https://xiaolincoding.com/network/3_tcp/tcp_stream.html)
 
-```plain
-Host: www.A.com
-```
+*Connection 字段*：最常用于客户端要求服务器使用「HTTP 长连接」机制，以便其他请求复用。
 
-有了 `Host` 字段，就可以将请求发往「同一台」服务器上的不同网站。
-
-*Content-Length 字段*
-
-服务器在返回数据时，会有 `Content-Length` 字段，表明本次回应的数据长度。
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/8-content-length字段.png)
-
-```plain
-Content-Length: 1000
-```
-
-如上面则是告诉浏览器，本次服务器回应的数据长度是 1000 个字节，后面的字节就属于下一个回应了。
-
-大家应该都知道 HTTP 是基于 TCP 传输协议进行通信的，而使用了 TCP 传输协议，就会存在一个“粘包”的问题，**HTTP 协议通过设置回车符、换行符作为 HTTP header 的边界，通过 Content-Length 字段作为 HTTP body 的边界，这两个方式都是为了解决“粘包”的问题**。具体什么是 TCP 粘包，可以看这篇文章：[如何理解是 TCP 面向字节流协议？](https://xiaolincoding.com/network/3_tcp/tcp_stream.html)
-
-*Connection 字段*
-
-`Connection` 字段最常用于客户端要求服务器使用「HTTP 长连接」机制，以便其他请求复用。
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/9-connection字段.png)
-
-HTTP 长连接的特点是，只要任意一端没有明确提出断开连接，则保持 TCP 连接状态。
-
-![HTTP 长连接](https://img-blog.csdnimg.cn/img_convert/d2b20d1cc03936332adb2a68512eb167.png)
-
+>HTTP 长连接的特点是，只要任意一端没有明确提出断开连接，则保持 TCP 连接状态。    
 HTTP/1.1 版本的默认连接都是长连接，但为了兼容老版本的 HTTP，需要指定 `Connection` 首部字段的值为 `Keep-Alive`。
-
-```plain
-Connection: Keep-Alive
-```
-
-开启了 HTTP Keep-Alive 机制后，连接就不会中断，而是保持连接。当客户端发送另一个请求时，它会使用同一个连接，一直持续到客户端或服务器端提出断开连接。
-
 PS：大家不要把 HTTP  Keep-Alive 和 TCP Keepalive 搞混了，这两个虽然长的像，但是不是一个东西，具体可以看我这篇文章：[TCP Keepalive 和 HTTP Keep-Alive 是一个东西吗？](https://xiaolincoding.com/network/3_tcp/tcp_http_keepalive.html)
 
-*Content-Type 字段*
+*Content-Type 字段*：服务器回应时，告诉客户端，本次数据是什么格式。
 
-`Content-Type` 字段用于服务器回应时，告诉客户端，本次数据是什么格式。
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/10-content-type字段.png)
-
-```plain
-Content-Type: text/html; Charset=utf-8
-```
-
-上面的类型表明，发送的是网页，而且编码是 UTF-8。
-
-客户端请求的时候，可以使用 `Accept` 字段声明自己可以接受哪些数据格式。
-
-```plain
-Accept: */*
-```
-
-上面代码中，客户端声明自己可以接受任何格式的数据。
-
-*Content-Encoding 字段*
-
-`Content-Encoding` 字段说明数据的压缩方法。表示服务器返回的数据使用了什么压缩格式
+*Content-Encoding 字段*：说明数据的压缩方法。表示服务器返回的数据使用了什么压缩格式
 
 ![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/11-content-encoding字段.png)
-
-
-```plain
-Content-Encoding: gzip
-```
-
-上面表示服务器返回的数据采用了 gzip 方式压缩，告知客户端需要用此方式解压。
-
-客户端在请求时，用 `Accept-Encoding` 字段说明自己可以接受哪些压缩方法。
-
-```plain
-Accept-Encoding: gzip, deflate
-```
 
 ---
 
 ## GET 与 POST
 
-### GET 和 POST 有什么区别？
+### 🚩 GET 和 POST 有什么区别？
 
-根据 RFC 规范，**GET 的语义是从服务器获取指定的资源**，这个资源可以是静态的文本、页面、图片视频等。GET 请求的参数位置一般是写在 URL 中，URL 规定只能支持 ASCII，所以 GET 请求的参数只允许 ASCII 字符，而且浏览器会对 URL 的长度有限制（HTTP 协议本身对 URL 长度并没有做任何规定）。
+| 特性       | GET                                                      | POST                                                         |
+|------------|-----------------------------------------------------------|--------------------------------------------------------------|
+| 用途       | 请求资源或查询数据                                       | 提交数据或创建/更新资源                                     |
+| 参数位置   | URL 查询字符串（`?key=value&key=value`）                | 请求体（body）                                               |
+| 数据可见性 | 明文显示在 URL 中                                        | 参数在请求体中，不显示在 URL 中                             |
+| 长度限制   | 限制较大（一般为 2048 字符）                             | 无限制，可以传输大量数据                                     |
+| 缓存       | 可以缓存（浏览器可以缓存 GET 请求）                     | 通常不缓存                                                   |
+| 幂等性     | 幂等（多次相同请求产生相同结果）                         | 非幂等（每次请求可能产生不同结果）                           |
+| 安全性     | 不适合传递敏感数据（明文传输）                           | 比较安全，但仍需使用 HTTPS 加密通信                         |
+| 重复执行   | 支持重复执行（不会产生副作用）                           | 不支持重复执行（可能导致重复操作）                           |
+| 使用场景   | 获取资源、查询操作、导航等                               | 提交表单、上传文件、创建/修改数据等                         |
 
-比如，你打开我的文章，浏览器就会发送 GET 请求给服务器，服务器就会返回文章的所有文字及资源。
-
-![GET 请求](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/12-Get请求.png)
-
-根据 RFC 规范，**POST 的语义是根据请求负荷（报文 body）对指定的资源做出处理**，具体的处理方式视资源类型而不同。POST 请求携带数据的位置一般是写在报文 body 中，body 中的数据可以是任意格式的数据，只要客户端与服务端协商好即可，而且浏览器不会对 body 大小做限制。
-
-比如，你在我文章底部，敲入了留言后点击「提交」（**暗示你们留言**），浏览器就会执行一次 POST 请求，把你的留言文字放进了报文 body 里，然后拼接好 POST 请求头，通过 TCP 协议发送给服务器。
-
-![POST 请求](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/13-Post请求.png)
-
-### GET 和 POST 方法都是安全和幂等的吗？
-
-先说明下安全和幂等的概念：
-
-- 在 HTTP 协议里，所谓的「安全」是指请求方法不会「破坏」服务器上的资源。
-- 所谓的「幂等」，意思是多次执行相同的操作，是无副作用的。
-
-如果从 RFC 规范定义的语义来看： 
-
-- **GET 方法就是安全且幂等的**，因为它是「只读」操作，无论操作多少次，服务器上的数据都是安全的。所以，**可以对 GET 请求的数据做缓存，这个缓存可以做到浏览器本身上（彻底避免浏览器发请求），也可以做到代理上（如 nginx），而且在浏览器中 GET 请求可以保存为书签**。
-- **POST** 因为是「新增或提交数据」的操作，会修改服务器上的资源，所以是**不安全**的，且多次提交数据就会创建多个资源，所以**不是幂等**的。所以，**浏览器一般不会缓存 POST 请求，也不能把 POST 请求保存为书签**。
-
-做个简要的小结。
-
-GET 的语义是请求获取指定的资源。GET 方法是安全、幂等、可被缓存的。
-
-POST 的语义是根据请求负荷（报文主体）对指定的资源做出处理，具体的处理方式视资源类型而不同。POST 不安全，不幂等，（大部分实现）不可缓存。
-
-注意，上面是从 RFC 规范定义的语义来分析的。
-
-但是实际过程中，开发者不一定会按照 RFC 规范定义的语义来实现 GET 和 POST 方法。比如：
-
-- 可以用 GET 方法实现新增或删除数据的请求，这样实现的 GET 方法自然就不是安全和幂等。
-- 可以用 POST 方法实现查询数据的请求，这样实现的  POST 方法自然就是安全和幂等。
-
-曾经有个笑话，有人写了个博客，删除博客用的是 GET 请求，他觉得没人访问就连鉴权都没做。然后 Google 服务器爬虫爬了一遍，他所有博文就没了。。。
-
-如果「安全」放入概念是指信息是否会被泄漏的话，虽然 POST 用 body 传输数据，而 GET 用 URL 传输，这样数据会在浏览器地址栏容易看到，但是并不能说 GET 不如 POST 安全的。
-
-因为 HTTP 传输的内容都是明文的，虽然在浏览器地址栏看不到 POST 提交的 body 数据，但是只要抓个包就都能看到了。
-
-所以，要避免传输过程中数据被窃取，就要使用 HTTPS 协议，这样所有 HTTP 的数据都会被加密传输。
-
-> GET 请求可以带 body 吗？
-
-RFC 规范并没有规定 GET 请求不能带 body 的。理论上，任何请求都可以带 body 的。只是因为 RFC 规范定义的 GET 请求是获取资源，所以根据这个语义不需要用到 body。
-
-另外，URL 中的查询参数也不是 GET 所独有的，POST 请求的 URL 中也可以有参数的。
 
 ## HTTP 缓存技术
 
