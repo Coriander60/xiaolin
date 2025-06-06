@@ -1,5 +1,33 @@
 # 3.1 HTTP 常见面试题
 
+- [3.1 HTTP 常见面试题](#31-http-常见面试题)
+  - [HTTP 基本概念](#http-基本概念)
+    - [HTTP的全称是什么，定义是什么？](#http的全称是什么定义是什么)
+    - [HTTP 常见的状态码有哪些？](#http-常见的状态码有哪些)
+    - [HTTP 常见字段有哪些？](#http-常见字段有哪些)
+  - [GET 与 POST](#get-与-post)
+    - [GET 和 POST 有什么区别？](#get-和-post-有什么区别)
+  - [HTTP 缓存技术](#http-缓存技术)
+    - [HTTP 缓存有哪些实现方式？](#http-缓存有哪些实现方式)
+    - [什么是强制缓存？](#什么是强制缓存)
+    - [什么是协商缓存？](#什么是协商缓存)
+  - [HTTP 特性](#http-特性)
+    - [HTTP/1.1 的优点有哪些？](#http11-的优点有哪些)
+    - [HTTP/1.1 的缺点有哪些？](#http11-的缺点有哪些)
+    - [HTTP/1.1 的性能如何？](#http11-的性能如何)
+  - [HTTP 与 HTTPS](#http-与-https)
+    - [HTTP 与 HTTPS 有哪些区别？](#http-与-https-有哪些区别)
+    - [HTTPS 解决了 HTTP 的哪些问题？](#https-解决了-http-的哪些问题)
+    - [HTTPS  是如何建立连接的？其间交互了什么？](#https--是如何建立连接的其间交互了什么)
+    - [HTTPS 的应用数据是如何保证完整性的？](#https-的应用数据是如何保证完整性的)
+    - [HTTPS 一定安全可靠吗？](#https-一定安全可靠吗)
+  - [HTTP/1.1、HTTP/2、HTTP/3 演变](#http11http2http3-演变)
+    - [HTTP/1.1 相比 HTTP/1.0 提高了什么性能？](#http11-相比-http10-提高了什么性能)
+    - [HTTP/2 做了什么优化？](#http2-做了什么优化)
+    - [HTTP/3 做了哪些优化？](#http3-做了哪些优化)
+  - [读者问答](#读者问答)
+
+
 小林我搜集了 6 大类 HTTP 面试常问的题目，同时这 6 大类题跟 **HTTP 的发展和演变**关联性是比较大的，通过**问答 + 图解**的形式**由浅入深**的方式帮助大家进一步的学习和理解 HTTP。
 
 1. HTTP 基本概念
@@ -14,7 +42,7 @@
 
 ## HTTP 基本概念
 
-### 🚩 HTTP的全称是什么，定义是什么？
+### HTTP的全称是什么，定义是什么？
 
 HTTP 是超文本传输协议，也就是**H**yper**T**ext **T**ransfer **P**rotocol。
 
@@ -24,7 +52,7 @@ HTTP 是超文本传输协议，也就是**H**yper**T**ext **T**ransfer **P**rot
 
 这种说法是**不正确**的。因为也可以是「服务器< -- >服务器」，所以采用**两点之间**的描述会更准确。
 
-### 🚩 HTTP 常见的状态码有哪些？
+### HTTP 常见的状态码有哪些？
 
 ![ 五大类 HTTP 状态码 ](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/6-五大类HTTP状态码.png)
 
@@ -68,7 +96,7 @@ HTTP 是超文本传输协议，也就是**H**yper**T**ext **T**ransfer **P**rot
 
 - 「**503 Service Unavailable**」服务器繁忙。
 
-### 🚩 HTTP 常见字段有哪些？
+### HTTP 常见字段有哪些？
 
 *Host* 字段：客户端发送请求时，用来指定服务器的域名。
 
@@ -86,13 +114,11 @@ PS：大家不要把 HTTP  Keep-Alive 和 TCP Keepalive 搞混了，这两个虽
 
 *Content-Encoding 字段*：说明数据的压缩方法。表示服务器返回的数据使用了什么压缩格式
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/11-content-encoding字段.png)
-
 ---
 
 ## GET 与 POST
 
-### 🚩 GET 和 POST 有什么区别？
+### GET 和 POST 有什么区别？
 
 | 特性       | GET                                                      | POST                                                         |
 |------------|-----------------------------------------------------------|--------------------------------------------------------------|
@@ -111,32 +137,18 @@ PS：大家不要把 HTTP  Keep-Alive 和 TCP Keepalive 搞混了，这两个虽
 
 ### HTTP 缓存有哪些实现方式？
 
-对于一些具有重复性的 HTTP 请求，比如每次请求得到的数据都一样的，我们可以把这对「请求 - 响应」的数据都**缓存在本地**，那么下次就直接读取本地的数据，不必在通过网络获取服务器的响应了，这样的话 HTTP/1.1 的性能肯定肉眼可见的提升。
-
-所以，避免发送 HTTP 请求的方法就是通过**缓存技术**，HTTP 设计者早在之前就考虑到了这点，因此 HTTP 协议的头部有不少是针对缓存的字段。
-
 HTTP 缓存有两种实现方式，分别是**强制缓存和协商缓存**。
 
 ### 什么是强制缓存？
 
-强缓存指的是只要浏览器判断缓存没有过期，则直接使用浏览器的本地缓存，决定是否使用缓存的主动性在于浏览器这边。
-
-如下图中，返回的是 200 状态码，但在 size 项中标识的是 from disk cache，就是使用了强制缓存。
-
-![](https://img-blog.csdnimg.cn/1cb6bc37597e4af8adfef412bfc57a42.png)
+只要浏览器判断缓存没有过期，则直接使用浏览器的本地缓存
 
 强缓存是利用下面这两个 HTTP 响应头部（Response Header）字段实现的，它们都用来表示资源在客户端缓存的有效期：
 
 - `Cache-Control`，是一个相对时间；
 - `Expires`，是一个绝对时间；
 
-如果 HTTP 响应头部同时有 Cache-Control 和 Expires 字段的话，**Cache-Control 的优先级高于 Expires** 。
-
-Cache-control 选项更多一些，设置更加精细，所以建议使用 Cache-Control 来实现强缓存。具体的实现流程如下：
-
-- 当浏览器第一次请求访问服务器资源时，服务器会在返回这个资源的同时，在 Response 头部加上 Cache-Control，Cache-Control 中设置了过期时间大小；
-- 浏览器再次请求访问服务器中的该资源时，会先**通过请求资源的时间与 Cache-Control 中设置的过期时间大小，来计算出该资源是否过期**，如果没有，则使用该缓存，否则重新请求服务器；
-- 服务器再次收到请求后，会再次更新 Response 头部的 Cache-Control。
+>如果 HTTP 响应头部同时有 Cache-Control 和 Expires 字段的话，**Cache-Control 的优先级高于 Expires** 。
 
 ### 什么是协商缓存？
 
@@ -148,19 +160,28 @@ Cache-control 选项更多一些，设置更加精细，所以建议使用 Cache
 
 协商缓存可以基于两种头部来实现。
 
-第一种：请求头部中的 `If-Modified-Since` 字段与响应头部中的 `Last-Modified` 字段实现，这两个字段的意思是：
+第一种：基于时间，请求头部中的 `If-Modified-Since` 字段与响应头部中的 `Last-Modified` 字段实现，这两个字段的意思是：
 
 - 响应头部中的 `Last-Modified`：标示这个响应资源的最后修改时间；
 - 请求头部中的 `If-Modified-Since`：当资源过期了，发现响应头中具有 Last-Modified 声明，则再次发起请求的时候带上 Last-Modified 的时间，服务器收到请求后发现有 If-Modified-Since 则与被请求资源的最后修改时间进行对比（Last-Modified），如果最后修改时间较新（大），说明资源又被改过，则返回最新资源，HTTP 200 OK；如果最后修改时间较旧（小），说明资源无新修改，响应 HTTP 304 走缓存。
 
+>第一次访问资源，在 Network 中查看响应头，确认有：
+```yaml
+Last-Modified: Wed, 05 Jun 2024 08:30:00 GMT
+```
+>第二次刷新页面或重新访问该资源：
+```yaml
+If-Modified-Since: Wed, 05 Jun 2024 08:30:00 GMT
+```
+>响应：
+```yaml
+HTTP/1.1 304 Not Modified
+```
 
-第二种：请求头部中的 `If-None-Match` 字段与响应头部中的 `ETag` 字段，这两个字段的意思是：
+第二种：基于唯一标识，请求头部中的 `If-None-Match` 字段与响应头部中的 `ETag` 字段，这两个字段的意思是：
   - 响应头部中 `Etag`：唯一标识响应资源；
   - 请求头部中的 `If-None-Match`：当资源过期时，浏览器发现响应头里有 Etag，则再次向服务器发起请求时，会将请求头 If-None-Match 值设置为 Etag 的值。服务器收到请求后进行比对，如果资源没有变化返回 304，如果资源变化了返回 200。
 
-第一种实现方式是基于时间实现的，第二种实现方式是基于一个唯一标识实现的，相对来说后者可以更加准确地判断文件内容是否被修改，避免由于时间篡改导致的不可靠问题。
-
-如果在第一次请求资源的时候，服务端返回的 HTTP 响应头部同时有 Etag 和 Last-Modified 字段，那么客户端再下一次请求的时候，如果带上了 ETag 和 Last-Modified 字段信息给服务端，**这时 Etag 的优先级更高**，也就是服务端先会判断 Etag 是否变化了，如果 Etag 有变化就不用在判断 Last-Modified 了，如果 Etag 没有变化，然后再看  Last-Modified。
 
 **为什么 ETag 的优先级更高？** 这是因为 ETag 主要能解决 Last-Modified 几个比较难以解决的问题：
 
@@ -186,10 +207,6 @@ Cache-control 选项更多一些，设置更加精细，所以建议使用 Cache
 - 如果浏览器收到 304 的请求响应状态码，则会从本地缓存中加载资源，否则更新资源。
 
 ## HTTP 特性
-
-到目前为止，HTTP 常见到版本有 HTTP/1.1，HTTP/2.0，HTTP/3.0，不同版本的 HTTP 特性是不一样的。
-
-这里先用  HTTP/1.1 版本给大家介绍，其他版本的后续也会介绍。
 
 ###  HTTP/1.1 的优点有哪些？
 
