@@ -1,5 +1,18 @@
 # 3.9 既然有 HTTP 协议，为什么还要有 WebSocket？
 
+- [3.9 既然有 HTTP 协议，为什么还要有 WebSocket？](#39-既然有-http-协议为什么还要有-websocket)
+  - [使用 HTTP 不断轮询](#使用-http-不断轮询)
+  - [使用 HTTP 定时轮询](#使用-http-定时轮询)
+  - [长轮询](#长轮询)
+  - [WebSocket 是什么](#websocket-是什么)
+    - [怎么建立 WebSocket 连接](#怎么建立-websocket-连接)
+    - [WebSocket 抓包](#websocket-抓包)
+  - [HTTP 和 WebSocket 的关系](#http-和-websocket-的关系)
+    - [WebSocket 的消息格式](#websocket-的消息格式)
+    - [WebSocket 的使用场景](#websocket-的使用场景)
+  - [总结](#总结)
+
+
 > 来源：公众号@小白 debug
 >
 > 原文地址：[既然有 HTTP 协议，为什么还要有 WebSocket？](https://mp.weixin.qq.com/s/jJNdXMNmXcE8wSE0gbtTAQ)
