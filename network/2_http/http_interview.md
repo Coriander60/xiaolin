@@ -24,6 +24,7 @@
   - [HTTP/1.1、HTTP/2、HTTP/3 演变](#http11http2http3-演变)
     - [HTTP/1.1 相比 HTTP/1.0 提高了什么性能？](#http11-相比-http10-提高了什么性能)
     - [HTTP/2 做了什么优化？](#http2-做了什么优化)
+    - [HTTP/2 有什么缺陷？](#http2-有什么缺陷)
     - [HTTP/3 做了哪些优化？](#http3-做了哪些优化)
   - [读者问答](#读者问答)
 
@@ -354,11 +355,11 @@ HTTP**S** 在 HTTP 与 TCP 层之间加入了 `SSL/TLS` 协议，可以很好的
 
 通过**混合加密**的方式可以保证信息的**机密性**，解决了窃听的风险。
 
-![alt text](对称加密.png)
+![alt text](img/对称加密.png)
 
-![alt text](非对称加密.png)
+![alt text](img/非对称加密.png)
 
-![alt text](混合加密.png)
+![alt text](img/混合加密.png)
 
 HTTPS 采用的是**对称加密**和**非对称加密**结合的「混合加密」方式：
 
@@ -396,7 +397,7 @@ HTTPS 采用的是**对称加密**和**非对称加密**结合的「混合加密
 
 所以非对称加密的用途主要在于**通过「私钥加密，公钥解密」的方式，来确认消息的身份**，我们常说的**数字签名算法**，就是用的是这种方式，不过私钥加密内容不是内容本身，而是**对内容的哈希值加密**。
 
-![alt text](数字签名.png)
+![alt text](img/数字签名.png)
 
 私钥是由服务端保管，然后服务端会向客户端颁发对应的公钥。如果客户端收到的信息，能被公钥解密，就说明该消息是由服务器发送的。
 
@@ -411,7 +412,7 @@ HTTPS 采用的是**对称加密**和**非对称加密**结合的「混合加密
 
 但是这还远远不够，**还缺少身份验证的环节**，万一公钥是被伪造的呢？
 
-![alt text](伪造公钥.png)
+![alt text](img/伪造公钥.png)
 
 CA（数字证书认证机构），将服务器公钥放在数字证书（由数字证书认证机构颁发）中，只要证书是可信的，公钥就是可信的。
 
@@ -531,8 +532,6 @@ TLS 记录协议主要负责消息（HTTP 数据）的压缩，加密及数据�
 
 之前有读者在字节面试的时候，被问到：**HTTPS 一定安全可靠吗？**
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/http/提问.jpeg)
-
 这个问题的场景是这样的：客户端通过浏览器向服务端发起 HTTPS 请求时，被「假基站」转发到了一个「中间人服务器」，于是客户端是和「中间人服务器」完成了 TLS 握手，然后这个「中间人服务器」再与真正的服务端完成 TLS 握手。
 
 ![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/http/https中间人.drawio.png)
@@ -601,14 +600,14 @@ TLS 记录协议主要负责消息（HTTP 数据）的压缩，加密及数据�
 
 HTTP/1.1 相比 HTTP/1.0 性能上的改进：
 
-- 使用长连接的方式改善了 HTTP/1.0 短连接造成的性能开销。
+- 使用长连接，多个请求可以复用同一个TCP连接，改善了 HTTP/1.0 短连接造成的性能开销。
 - 支持管道（pipeline）网络传输，只要第一个请求发出去了，不必等其回来，就可以发第二个请求出去，可以减少整体的响应时间。
 
 
 但 HTTP/1.1 还是有性能瓶颈：
 
 - 请求 / 响应头部（Header）未经压缩就发送，首部信息越多延迟越大。只能压缩 `Body` 的部分；
-- 发送冗长的首部。每次互相发送相同的首部造成的浪费较多；
+- 发送冗长的头部。每次互相发送相同的头部造成浪费；
 - 服务器是按请求的顺序响应的，如果服务器响应慢，会招致客户端一直请求不到数据，也就是队头阻塞；
 - 没有请求优先级控制；
 - 请求只能从客户端开始，服务器只能被动响应。
@@ -634,82 +633,37 @@ HTTP/2 会**压缩头**（Header）如果你同时发出多个请求，他们的
 
 *2. 二进制格式*
 
-HTTP/2 不再像 HTTP/1.1 里的纯文本形式的报文，而是全面采用了**二进制格式**，头信息和数据体都是二进制，并且统称为帧（frame）：**头信息帧（Headers Frame）和数据帧（Data Frame）**。
-
-![HTTP/1 与 HTTP/2 ](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%B8%A7.png)
-
-这样虽然对人不友好，但是对计算机非常友好，因为计算机只懂二进制，那么收到报文后，无需再将明文的报文转成二进制，而是直接解析二进制报文，这**增加了数据传输的效率**。
-
-比如状态码 200，在 HTTP/1.1 是用 '2''0''0' 三个字符来表示（二进制：00110010 00110000 00110000），共用了 3 个字节，如下图
-
-![img](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/http1.png)
-
-在 HTTP/2 对于状态码 200 的二进制编码是 10001000，只用了 1 字节就能表示，相比于 HTTP/1.1 节省了 2 个字节，如下图：
-
-![img](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/h2c.png)
-
-Header: :status: 200 OK 的编码内容为：1000 1000，那么表达的含义是什么呢？
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/http/index.png)
-
-1. 最前面的 1 表示该 Header 是静态表中已经存在的 KV。（至于什么是静态表，可以看这篇：[HTTP/2 牛逼在哪？](https://xiaolincoding.com/network/2_http/http2.html)）
-2. 在静态表理，“:status: 200 ok”静态表编码是 8，二进制即是 1000。
-
-因此，整体加起来就是 1000 1000。
+HTTP/2 不再像 HTTP/1.1 里的纯文本形式的报文，而是全面采用了**二进制帧格式**，头信息和数据体都是二进制，并且统称为帧（frame）：**头信息帧（Headers Frame）和数据帧（Data Frame）**。大大减小了传输量
 
 *3. 并发传输*
 
-我们都知道 HTTP/1.1 的实现是基于请求 - 响应模型的。同一个连接中，HTTP 完成一个事务（请求与响应），才能处理下一个事务，也就是说在发出请求等待响应的过程中，是没办法做其他事情的，如果响应迟迟不来，那么后续的请求是无法发送的，也造成了**队头阻塞**的问题。
+虽然 HTTP/1.1 是长连接(多个请求可以复用同一个TCP连接)，但每个连接仍然是顺序处理请求的，浏览器仍然必须按顺序发送请求并等待响应返回后再发送下一个请求，中间某个响应卡住，容易造成了**队头阻塞**。
 
-而 HTTP/2 就很牛逼了，引出了 Stream 概念，多个 Stream 复用在一条 TCP 连接。
+HTTP/2.0 在同一TCP连接上可以同时传输多个 请求和响应(stream)。
+
+**不同的 HTTP 请求用独一无二的 Stream ID 来区分，接收端可以通过 Stream ID 有序组装成 HTTP 消息，不同 Stream 的帧是可以乱序发送的，因此可以并发不同的 Strem**。
 
 ![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/网络/http2/stream.png)
-
-从上图可以看到，1 个 TCP 连接包含多个 Stream，Stream 里可以包含 1 个或多个 Message，Message 对应 HTTP/1 中的请求或响应，由 HTTP 头部和包体构成。Message 里包含一条或者多个 Frame，Frame 是 HTTP/2 最小单位，以二进制压缩格式存放 HTTP/1 中的内容（头部和包体）。
-
-**针对不同的 HTTP 请求用独一无二的 Stream ID 来区分，接收端可以通过 Stream ID 有序组装成 HTTP 消息，不同 Stream 的帧是可以乱序发送的，因此可以并发不同的 Stream，也就是 HTTP/2 可以并行交错地发送请求和响应**。
-
-比如下图，服务端**并行交错地**发送了两个响应：Stream 1 和 Stream 3，这两个 Stream 都是跑在一个 TCP 连接上，客户端收到后，会根据相同的 Stream ID 有序组装成 HTTP 消息。
 
 ![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/http/http2多路复用.jpeg)
 
 *4、服务器推送*
 
-HTTP/2 还在一定程度上改善了传统的「请求 - 应答」工作模式，服务端不再是被动地响应，可以**主动**向客户端发送消息。
+HTTP/2 可以在客户端请求一个资源时，将其他相关资源一并推送给客户端，从而减少了客户端的请求次数和延迟
 
-客户端和服务器**双方都可以建立 Stream**，Stream ID 也是有区别的，客户端建立的 Stream 必须是奇数号，而服务器建立的 Stream 必须是偶数号。
-
-比如下图，Stream 1 是客户端向服务端请求的资源，属于客户端建立的 Stream，所以该 Stream 的 ID 是奇数（数字 1）；Stream 2 和 4 都是服务端主动向客户端推送的资源，属于服务端建立的 Stream，所以这两个 Stream 的 ID 是偶数（数字 2 和 4）。
+>客户端和服务器**双方都可以建立 Stream**，Stream ID 也是有区别的，客户端建立的 Stream 必须是奇数号，而服务器建立的 Stream 必须是偶数号。
 
 ![](https://img-blog.csdnimg.cn/83445581dafe409d8cfd2c573b2781ac.png)
 
-再比如，客户端通过 HTTP/1.1 请求从服务器那获取到了 HTML 文件，而 HTML 可能还需要依赖 CSS 来渲染页面，这时客户端还要再发起获取 CSS 文件的请求，需要两次消息往返，如下图左边部分：
-
 ![img](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/push.png)
 
-如上图右边部分，在 HTTP/2 中，客户端在访问 HTML 时，服务器可以直接主动推送 CSS 文件，减少了消息传递的次数。
+### HTTP/2 有什么缺陷？
 
-> HTTP/2 有什么缺陷？
-
-HTTP/2 通过 Stream 的并发能力，解决了 HTTP/1 队头阻塞的问题，看似很完美了，但是 HTTP/2 还是存在“队头阻塞”的问题，只不过问题不是在 HTTP 这一层面，而是在 TCP 这一层。
+HTTP/2 通过 Stream 的并发能力，解决了 HTTP/1 队头阻塞的问题，但是 HTTP/2 还是存在“队头阻塞”的问题，只不过问题不是在 HTTP 这一层面，而是在 TCP 这一层。
 
 **HTTP/2 是基于 TCP 协议来传输数据的，TCP 是字节流协议，TCP 层必须保证收到的字节数据是完整且连续的，这样内核才会将缓冲区里的数据返回给 HTTP 应用，那么当「前 1 个字节数据」没有到达时，后收到的字节数据只能存放在内核缓冲区里，只有等到这 1 个字节数据到达时，HTTP/2 应用层才能从内核中拿到数据，这就是 HTTP/2 队头阻塞问题。**
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/quic/http2阻塞.jpeg)
-
-举个例子，如下图：
-
-![img](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http3/tcp%E9%98%9F%E5%A4%B4%E9%98%BB%E5%A1%9E.gif)
-
-图中发送方发送了很多个 packet，每个 packet 都有自己的序号，你可以认为是 TCP 的序列号，其中 packet 3 在网络中丢失了，即使 packet 4-6 被接收方收到后，由于内核中的 TCP 数据不是连续的，于是接收方的应用层就无法从内核中读取到，只有等到 packet 3 重传后，接收方的应用层才可以从内核中读取到数据，这就是 HTTP/2 的队头阻塞问题，是在 TCP 层面发生的。
-
 所以，一旦发生了丢包现象，就会触发 TCP 的重传机制，这样在一个 TCP 连接中的**所有的 HTTP 请求都必须等待这个丢了的包被重传回来**。
-
-::: tip
-
-如果想更进一步了解 HTTP/2 协议，可以看我这篇文章：[HTTP/2 牛逼在哪？](https://xiaolincoding.com/network/2_http/http2.html)
-
-:::
 
 ### HTTP/3 做了哪些优化？
 
@@ -738,8 +692,6 @@ QUIC 有自己的一套机制可以保证传输的可靠性的。**当某个流�
 
 所以，QUIC 连接上的多个 Stream 之间并没有依赖，都是独立的，某个流发生丢包了，只会影响该流，其他流不受影响。
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/quic/quic无阻塞.jpeg)
-
 *2、更快的连接建立*
 
 对于 HTTP/1 和 HTTP/2 协议，TCP 和 TLS 是分层的，分别属于内核实现的传输层、openssl 库实现的表示层，因此它们难以合并在一起，需要分批次来握手，先 TCP 握手，再 TLS 握手。
@@ -760,40 +712,13 @@ HTTP/3 在传输数据前虽然需要 QUIC 协议握手，但这个握手过程�
 
 基于 TCP 传输协议的 HTTP 协议，由于是通过四元组（源 IP、源端口、目的 IP、目的端口）确定一条 TCP 连接。
 
-![TCP 四元组](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzEwLmpwZw?x-oss-process=image/format,png)
-
 那么**当移动设备的网络从 4G 切换到 WIFI 时，意味着 IP 地址变化了，那么就必须要断开连接，然后重新建立连接**。而建立连接的过程包含 TCP 三次握手和 TLS 四次握手的时延，以及 TCP 慢启动的减速过程，给用户的感觉就是网络突然卡顿了一下，因此连接的迁移成本是很高的。
 
 而 QUIC 协议没有用四元组的方式来“绑定”连接，而是通过**连接 ID** 来标记通信的两个端点，客户端和服务器可以各自选择一组 ID 来标记自己，因此即使移动设备的网络变化后，导致 IP 地址变化了，只要仍保有上下文信息（比如连接 ID、TLS 密钥等），就可以“无缝”地复用原连接，消除重连的成本，没有丝毫卡顿感，达到了**连接迁移**的功能。
 
-所以，QUIC 是一个在 UDP 之上的**伪** TCP + TLS + HTTP/2 的多路复用的协议。
 
+所以，QUIC 是一个在 UDP 之上的**伪** TCP + TLS + HTTP/2 的多路复用的协议。  
 QUIC 是新协议，对于很多网络设备，根本不知道什么是 QUIC，只会当做 UDP，这样会出现新的问题，因为有的网络设备是会丢掉 UDP 包的，而 QUIC 是基于 UDP 实现的，那么如果网络设备无法识别这个是 QUIC 包，那么就会当作 UDP 包，然后被丢弃。
-
-HTTP/3 现在普及的进度非常的缓慢，不知道未来 UDP 是否能够逆袭 TCP。
-
-::: tip
-
-如果想更进一步了解 HTTP/3 和 QUIC 协议，可以看我这两篇文章：
-
-- [HTTP/3 强势来袭](https://xiaolincoding.com/network/2_http/http3.html)
-- [如何基于 UDP 协议实现可靠传输？](https://xiaolincoding.com/network/3_tcp/quic.html)
-
-:::
-
-----
-
-参考资料：
-
-[1] 上野 宣。图解 HTTP.人民邮电出版社。
-
-[2] 罗剑锋。透视 HTTP 协议。极客时间。
-
-[3] 陈皓.HTTP 的前世今。酷壳 CoolShell.https://coolshell.cn/articles/19840.html
-
-[4] 阮一峰.HTTP 协议入门。阮一峰的网络日志.http://www.ruanyifeng.com/blog/2016/08/http.html
-
-----
 
 
 ## 读者问答
@@ -826,16 +751,4 @@ SSL/TLS 1.2 需要 4 握手，需要 2 个 RTT 的时延，我文中的图是把
 
 
 ![T](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/计算机网络/HTTP/30-TLS1.3.png)
-
-----
-
-
-本文的 `30` 张图片，都是从一条线两条线画出来，灰常的费劲，深切感受到画图也是个**体力活**啊！ 
-
-爱偷懒的我其实不爱画图，但为了让大家能更好的理解，在跟自己无数次斗争后，踏上了耗时耗体力的画图的不归路，希望对你们有帮助！
-
-
-**小林是专为大家图解的工具人，Goodbye，我们下次见！**
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E5%85%B6%E4%BB%96/%E5%85%AC%E4%BC%97%E5%8F%B7%E4%BB%8B%E7%BB%8D.png)
 
