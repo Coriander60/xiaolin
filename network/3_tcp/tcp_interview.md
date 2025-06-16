@@ -90,9 +90,7 @@
 
 TCP 是**面向连接的、可靠的、基于字节流**的传输层通信协议。
 
-![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzguanBn?x-oss-process=image/format,png)
-
-- **面向连接**：一定是「一对一」才能连接，不能像 UDP 协议可以一个主机同时向多个主机发送消息，也就是一对多是无法做到的；
+- **面向连接**：一定是「一对一」才能连接，不能像 UDP 协议可以一个主机同时向多个主机发送消息；
 
 - **可靠的**：无论网络链路中出现了怎样的链路变化，TCP 都可以保证一个报文一定能够到达接收端；
 
@@ -100,14 +98,7 @@ TCP 是**面向连接的、可靠的、基于字节流**的传输层通信协议
 
 ### 什么是 TCP 连接？
 
-我们来看看 RFC 793 是如何定义「连接」的：
-
-*Connections:
-The reliability and flow control mechanisms described above require that TCPs initialize and maintain certain status information for each data stream.  The combination of this information, including sockets, sequence numbers, and window sizes, is called a connection.*
-
-简单来说就是，**用于保证可靠性和流量控制维护的某些状态信息，这些信息的组合，包括 Socket、序列号和窗口大小称为连接。**
-
-![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzkuanBn?x-oss-process=image/format,png)
+是用于保证可靠性和流量控制维护的某些状态信息，这些信息的组合，包括 **Socket**、**序列号** 和 **窗口大小**。
 
 所以我们可以知道，建立一个 TCP 连接是需要客户端与服务端达成上述三个信息的共识。
 
@@ -124,29 +115,16 @@ TCP 四元组可以唯一的确定一个连接，四元组包括如下：
 - 目的地址
 - 目的端口
 
-![TCP 四元组](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzEwLmpwZw?x-oss-process=image/format,png)
-
 源地址和目的地址的字段（32 位）是在 IP 头部中，作用是通过 IP 协议发送报文给对方主机。
 
 源端口和目的端口的字段（16 位）是在 TCP 头部中，作用是告诉 TCP 协议应该把报文发给哪个进程。
 
-> 有一个 IP 的服务端监听了一个端口，它的 TCP 的最大连接数是多少？
-
-服务端通常固定在某个本地端口上监听，等待客户端的连接请求。
-
-因此，客户端 IP 和端口是可变的，其理论值计算公式如下：
-
-![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzExLmpwZw?x-oss-process=image/format,png)
+> 有一个 IP 的服务端监听了一个端口，它的 TCP 的最大连接数 理论值：  
+> 客户端IP数 × 每个IP可用的源端口数
 
 对 IPv4，客户端的 IP 数最多为 `2` 的 `32` 次方，客户端的端口数最多为 `2` 的 `16` 次方，也就是服务端单机最大 TCP 连接数，约为 `2` 的 `48` 次方。
 
-当然，服务端最大并发 TCP 连接数远不能达到理论上限，会受以下因素影响：
-
-- **文件描述符限制**，每个 TCP 连接都是一个文件，如果文件描述符被占满了，会发生 Too many open files。Linux 对可打开的文件描述符的数量分别作了三个方面的限制：
-  - **系统级**：当前系统可打开的最大数量，通过 `cat /proc/sys/fs/file-max` 查看；
-  - **用户级**：指定用户可打开的最大数量，通过 `cat /etc/security/limits.conf` 查看；
-  - **进程级**：单个进程可打开的最大数量，通过 `cat /proc/sys/fs/nr_open` 查看；
-- **内存限制**，每个 TCP 连接都要占用一定内存，操作系统的内存是有限的，如果内存资源被占满后，会发生 OOM。
+然而，服务端实际 受限于：**文件描述符限制** Too many open files、 **内存限制** OOM
 
 ### UDP 和 TCP 有什么区别呢？分别的应用场景是？
 
@@ -194,8 +172,8 @@ UDP 协议真的非常简单，头部只有 `8` 个字节（64 位），UDP 的�
 
 *7. 分片不同*
 
-- TCP 的数据大小如果大于 MSS 大小，则会在传输层进行分片，目标主机收到后，也同样在传输层组装 TCP 数据包，如果中途丢失了一个分片，只需要传输丢失的这个分片。
-- UDP 的数据大小如果大于 MTU 大小，则会在 IP 层进行分片，目标主机收到后，在 IP 层组装完数据，接着再传给传输层。
+- TCP 的数据大小如果大于 MSS (Maximum Segment Size，最大报文段长度) 大小，则会在传输层进行分片，目标主机收到后，也同样在传输层组装 TCP 数据包，如果中途丢失了一个分片，只需要传输丢失的这个分片。
+- UDP 的数据大小如果大于 MTU (Maximum Transmission Unit，最大传输单元) 大小，则会在 IP 层 (网络层) 进行分片，目标主机收到后，在 IP 层组装完数据，接着再传给传输层。
 
 **TCP 和 UDP 应用场景：**
 
