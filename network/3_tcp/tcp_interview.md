@@ -1,56 +1,47 @@
-# 4.1 TCP 三次握手与四次挥手面试题
+de# 4.1 TCP 三次握手与四次挥手面试题
 
-- [4.1 TCP 三次握手与四次挥手面试题](#41-tcp-三次握手与四次挥手面试题)
-  - [TCP 基本认识](#tcp-基本认识)
-    - [TCP 头格式有哪些？](#tcp-头格式有哪些)
-    - [为什么需要 TCP 协议？TCP 工作在哪一层？](#为什么需要-tcp-协议tcp-工作在哪一层)
-    - [什么是 TCP？](#什么是-tcp)
-    - [什么是 TCP 连接？](#什么是-tcp-连接)
-    - [如何唯一确定一个 TCP 连接呢？](#如何唯一确定一个-tcp-连接呢)
-    - [UDP 和 TCP 有什么区别呢？分别的应用场景是？](#udp-和-tcp-有什么区别呢分别的应用场景是)
-    - [TCP 和 UDP 可以使用同一个端口吗？](#tcp-和-udp-可以使用同一个端口吗)
-  - [TCP 连接建立](#tcp-连接建立)
-    - [TCP 三次握手过程是怎样的？](#tcp-三次握手过程是怎样的)
-    - [如何在 Linux 系统中查看 TCP 状态？](#如何在-linux-系统中查看-tcp-状态)
-    - [为什么是三次握手？不是两次、四次？](#为什么是三次握手不是两次四次)
-    - [为什么每次建立 TCP 连接时，初始化的序列号都要求不一样呢？](#为什么每次建立-tcp-连接时初始化的序列号都要求不一样呢)
-    - [初始序列号 ISN 是如何随机产生的？](#初始序列号-isn-是如何随机产生的)
-    - [既然 IP 层会分片，为什么 TCP 层还需要 MSS 呢？](#既然-ip-层会分片为什么-tcp-层还需要-mss-呢)
-    - [第一次握手丢失了，会发生什么？](#第一次握手丢失了会发生什么)
-    - [第二次握手丢失了，会发生什么？](#第二次握手丢失了会发生什么)
-    - [第三次握手丢失了，会发生什么？](#第三次握手丢失了会发生什么)
-    - [什么是 SYN 攻击？如何避免 SYN 攻击？](#什么是-syn-攻击如何避免-syn-攻击)
-  - [TCP 连接断开](#tcp-连接断开)
-    - [TCP 四次挥手过程是怎样的？](#tcp-四次挥手过程是怎样的)
-    - [为什么挥手需要四次？](#为什么挥手需要四次)
-    - [第一次挥手丢失了，会发生什么？](#第一次挥手丢失了会发生什么)
-    - [第二次挥手丢失了，会发生什么？](#第二次挥手丢失了会发生什么)
-    - [第三次挥手丢失了，会发生什么？](#第三次挥手丢失了会发生什么)
-    - [第四次挥手丢失了，会发生什么？](#第四次挥手丢失了会发生什么)
-    - [为什么 TIME\_WAIT 等待的时间是 2MSL？](#为什么-time_wait-等待的时间是-2msl)
-    - [为什么需要 TIME\_WAIT 状态？](#为什么需要-time_wait-状态)
-    - [TIME\_WAIT 过多有什么危害？](#time_wait-过多有什么危害)
-    - [如何优化 TIME\_WAIT？](#如何优化-time_wait)
-    - [服务器出现大量 TIME\_WAIT 状态的原因有哪些？](#服务器出现大量-time_wait-状态的原因有哪些)
-    - [服务器出现大量 CLOSE\_WAIT 状态的原因有哪些？](#服务器出现大量-close_wait-状态的原因有哪些)
-    - [如果已经建立了连接，但是客户端突然出现故障了怎么办？](#如果已经建立了连接但是客户端突然出现故障了怎么办)
-    - [如果已经建立了连接，但是服务端的进程崩溃会发生什么？](#如果已经建立了连接但是服务端的进程崩溃会发生什么)
-  - [Socket 编程](#socket-编程)
-    - [针对 TCP 应该如何 Socket 编程？](#针对-tcp-应该如何-socket-编程)
-    - [listen 时候参数 backlog 的意义？](#listen-时候参数-backlog-的意义)
-    - [accept 发生在三次握手的哪一步？](#accept-发生在三次握手的哪一步)
-    - [客户端调用 close 了，连接是断开的流程是什么？](#客户端调用-close-了连接是断开的流程是什么)
-    - [没有 accept，能建立 TCP 连接吗？](#没有-accept能建立-tcp-连接吗)
-    - [没有 listen，能建立 TCP 连接吗？](#没有-listen能建立-tcp-连接吗)
-  - [唠叨](#唠叨)
-
-
-**任 TCP 虐我千百遍，我仍待 TCP 如初恋。**
-
-巨巨巨巨长的提纲，发车！发车！
-
-![](https://img-blog.csdnimg.cn/1310bf5ed78e4c8186481c47719e0793.png)
-
+- [TCP 基本认识](#tcp-基本认识)
+  - [TCP 头格式有哪些？](#tcp-头格式有哪些)
+  - [为什么需要 TCP 协议？TCP 工作在哪一层？](#为什么需要-tcp-协议tcp-工作在哪一层)
+  - [什么是 TCP？](#什么是-tcp)
+  - [什么是 TCP 连接？](#什么是-tcp-连接)
+  - [如何唯一确定一个 TCP 连接呢？](#如何唯一确定一个-tcp-连接呢)
+  - [UDP 和 TCP 有什么区别呢？分别的应用场景是？](#udp-和-tcp-有什么区别呢分别的应用场景是)
+  - [TCP 和 UDP 可以使用同一个端口吗？](#tcp-和-udp-可以使用同一个端口吗)
+- [TCP 连接建立](#tcp-连接建立)
+  - [TCP 三次握手过程是怎样的？](#tcp-三次握手过程是怎样的)
+  - [如何在 Linux/Windows 系统中查看 TCP 状态？](#如何在-linuxwindows-系统中查看-tcp-状态)
+  - [为什么是三次握手？不是两次、四次？](#为什么是三次握手不是两次四次)
+  - [为什么每次建立 TCP 连接时，初始化的序列号都要求不一样呢？](#为什么每次建立-tcp-连接时初始化的序列号都要求不一样呢)
+  - [初始序列号 ISN 是如何随机产生的？](#初始序列号-isn-是如何随机产生的)
+  - [\[Todo\] 既然 IP 层会分片，为什么 TCP 层还需要 MSS 呢？](#todo-既然-ip-层会分片为什么-tcp-层还需要-mss-呢)
+  - [第一次握手丢失了，会发生什么？](#第一次握手丢失了会发生什么)
+  - [第二次握手丢失了，会发生什么？](#第二次握手丢失了会发生什么)
+  - [第三次握手丢失了，会发生什么？](#第三次握手丢失了会发生什么)
+  - [什么是 SYN 攻击？如何避免 SYN 攻击？](#什么是-syn-攻击如何避免-syn-攻击)
+- [TCP 连接断开](#tcp-连接断开)
+  - [TCP 四次挥手过程是怎样的？](#tcp-四次挥手过程是怎样的)
+  - [为什么挥手需要四次？](#为什么挥手需要四次)
+  - [第一次挥手丢失了，会发生什么？](#第一次挥手丢失了会发生什么)
+  - [第二次挥手丢失了，会发生什么？](#第二次挥手丢失了会发生什么)
+  - [第三次挥手丢失了，会发生什么？](#第三次挥手丢失了会发生什么)
+  - [第四次挥手丢失了，会发生什么？](#第四次挥手丢失了会发生什么)
+  - [为什么 TIME\_WAIT 等待的时间是 2MSL？](#为什么-time_wait-等待的时间是-2msl)
+  - [为什么需要 TIME\_WAIT 状态？](#为什么需要-time_wait-状态)
+  - [TIME\_WAIT 过多有什么危害？](#time_wait-过多有什么危害)
+  - [如何优化 TIME\_WAIT？](#如何优化-time_wait)
+  - [服务器出现大量 TIME\_WAIT 状态的原因有哪些？](#服务器出现大量-time_wait-状态的原因有哪些)
+  - [服务器出现大量 CLOSE\_WAIT 状态的原因有哪些？](#服务器出现大量-close_wait-状态的原因有哪些)
+  - [如果已经建立了连接，但是客户端突然出现故障了怎么办？](#如果已经建立了连接但是客户端突然出现故障了怎么办)
+  - [如果已经建立了连接，但是服务端的进程崩溃会发生什么？](#如果已经建立了连接但是服务端的进程崩溃会发生什么)
+- [Socket 编程](#socket-编程)
+  - [针对 TCP 应该如何 Socket 编程？](#针对-tcp-应该如何-socket-编程)
+  - [listen 时候参数 backlog 的意义？](#listen-时候参数-backlog-的意义)
+  - [accept 发生在三次握手的哪一步？](#accept-发生在三次握手的哪一步)
+  - [客户端调用 close 了，连接是断开的流程是什么？](#客户端调用-close-了连接是断开的流程是什么)
+  - [没有 accept，能建立 TCP 连接吗？](#没有-accept能建立-tcp-连接吗)
+  - [没有 listen，能建立 TCP 连接吗？](#没有-listen能建立-tcp-连接吗)
+- [唠叨](#唠叨)
 
 
 > PS：本次文章不涉及 TCP 流量控制、拥塞控制、可靠性传输等方面知识，这些知识在这篇：[你还在为 TCP 重传、滑动窗口、流量控制、拥塞控制发愁吗？看完图解就不愁了](https://mp.weixin.qq.com/s/Tc09ovdNacOtnMOMeRc_uA)
@@ -61,9 +52,8 @@
 
 ### TCP 头格式有哪些？
 
-我们先来看看 TCP 头的格式，标注颜色的表示与本文关联比较大的字段，其他字段不做详细阐述。
+<img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzYuanBn?x-oss-process=image/format,png" width="600"/>
 
-![TCP 头格式](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzYuanBn?x-oss-process=image/format,png)
 
 **序列号**：在建立连接时由计算机生成的随机数作为其初始值，通过 SYN 包传给接收端主机，每发送一次数据，就「累加」一次该「数据字节数」的大小。**用来解决网络包乱序问题。**
 
@@ -78,7 +68,7 @@
 
 ### 为什么需要 TCP 协议？TCP 工作在哪一层？
 
-`IP` 层是「不可靠」的，它不保证网络包的交付、不保证网络包的按序交付、也不保证网络包中的数据的完整性。
+`IP` 层（网络层）是「不可靠」的，它不保证网络包的交付、不保证网络包的按序交付、也不保证网络包中的数据的完整性。
 
 ![OSI 参考模型与 TCP/IP 的关系](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzcuanBn?x-oss-process=image/format,png)
 
@@ -98,7 +88,7 @@ TCP 是**面向连接的、可靠的、基于字节流**的传输层通信协议
 
 ### 什么是 TCP 连接？
 
-是用于保证可靠性和流量控制维护的某些状态信息，这些信息的组合，包括 **Socket**、**序列号** 和 **窗口大小**。
+是用于保证可靠性和流量控制维护的，某些状态信息的组合，包括 **Socket**、**序列号** 和 **窗口大小**。
 
 所以我们可以知道，建立一个 TCP 连接是需要客户端与服务端达成上述三个信息的共识。
 
@@ -132,7 +122,7 @@ UDP 不提供复杂的控制机制，利用 IP 提供面向「无连接」的通
 
 UDP 协议真的非常简单，头部只有 `8` 个字节（64 位），UDP 的头部格式如下：
 
-![UDP 头部格式](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzEyLmpwZw?x-oss-process=image/format,png)
+<img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzEyLmpwZw?x-oss-process=image/format,png" width=400>
 
 - 目标和源端口：主要是告诉 UDP 协议应该把报文发给哪个进程。
 - 包长度：该字段保存了 UDP 首部的长度跟数据的长度之和。
@@ -177,16 +167,26 @@ UDP 协议真的非常简单，头部只有 `8` 个字节（64 位），UDP 的�
 
 **TCP 和 UDP 应用场景：**
 
-由于 TCP 是面向连接，能保证数据的可靠性交付，因此经常用于：
+由于 TCP 是面向连接，常用于 对数据传输可靠性要求高的场景：
 
-- `FTP` 文件传输；
-- HTTP / HTTPS；
+- FTP 文件传输协议；
+- HTTP / HTTPS 超文本传输协议/安全超文本传输协议；
+- SMTP 简单邮件传输协议
+- POP3 邮局协议第 3 版
+- IMAP 互联网消息访问协议
+- Telnet 远程终端协议
+- SSH 安全外壳协议
 
-由于 UDP 面向无连接，它可以随时发送数据，再加上 UDP 本身的处理既简单又高效，因此经常用于：
+由于 UDP 面向无连接，常用于 对数据传输实时性要求高、可以容忍少量数据丢失的场景：
 
-- 包总量较少的通信，如 `DNS` 、`SNMP` 等；
-- 视频、音频等多媒体通信；
-- 广播通信；
+- HTTP/3 超文本传输协议
+- DHCP 动态主机配置协议
+- DNS 域名系统
+- RTP 实时传输协议
+- RTCP RTP控制协议
+- TFTP 简单文件传输协议
+- SNMP 简单网络管理协议
+- NTP 网络时间协议
 
 > 为什么 UDP 头部没有「首部长度」字段，而 TCP 头部有「首部长度」字段呢？
 
@@ -220,7 +220,7 @@ UDP 协议真的非常简单，头部只有 `8` 个字节（64 位），UDP 的�
 
 当主机收到数据包后，可以在 IP 包头的「协议号」字段知道该数据包是 TCP/UDP，所以可以根据这个信息确定送给哪个模块（TCP/UDP）处理，送给 TCP/UDP 模块的报文根据「端口号」确定送给哪个应用程序处理。
 
-![img](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/port/tcp%E5%92%8Cudp%E6%A8%A1%E5%9D%97.jpeg)
+<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/port/tcp%E5%92%8Cudp%E6%A8%A1%E5%9D%97.jpeg" width=400>
 
 因此，TCP/UDP 各自的端口号也相互独立，如 TCP 有一个 80 号端口，UDP 也可以有一个 80 号端口，二者并不冲突。
 
@@ -239,35 +239,60 @@ UDP 协议真的非常简单，头部只有 `8` 个字节（64 位），UDP 的�
 
 TCP 是面向连接的协议，所以使用 TCP 前必须先建立连接，而**建立连接是通过三次握手来进行的**。三次握手的过程如下图：
 
-![TCP 三次握手](https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4/%E7%BD%91%E7%BB%9C/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.drawio.png)
+<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4/%E7%BD%91%E7%BB%9C/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.drawio.png" width="500"/>
 
-- 一开始，客户端和服务端都处于 `CLOSE` 状态。先是服务端主动监听某个端口，处于 `LISTEN` 状态
+| 次数  | 发送方 | 主要字段                         | 说明        | **客户端状态**   | **服务端状态**               |
+| --- | --- | ---------------------------- | --------- | ----------- | ----------------------- |
+| 第一次 | 客户端 | SYN=1, Seq=x                 | 请求连接      | SYN\_SENT   | LISTEN                  |
+| 第二次 | 服务端 | SYN=1, ACK=1, Seq=y, Ack=x+1 | 同意并确认收到请求 | SYN\_SENT   | SYN\_RECV               |
+| 第三次 | 客户端 | ACK=1, Ack=y+1      | 确认建立连接    | ESTABLISHED | SYN\_RECV → ESTABLISHED |
+
+
+从上面的过程可以发现**第三次握手是可以携带数据的，前两次握手是不可以携带数据的**，这也是面试常问的题。  
+实际，双方都处于 `ESTABLISHED` 状态，连接已建立完成后，客户端和服务端才相互发送数据。
+
+
+<details>
+<summary>以下是三次报文：</summary>
+
+第一个报文 —— SYN 报文
 
 ![第一个报文 —— SYN 报文](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzE1LmpwZw?x-oss-process=image/format,png)
 
-- 客户端会随机初始化序号（`client_isn`），将此序号置于 TCP 首部的「序号」字段中，同时把 `SYN` 标志位置为 `1`，表示 `SYN` 报文。接着把第一个 SYN 报文发送给服务端，表示向服务端发起连接，该报文不包含应用层数据，之后客户端处于 `SYN-SENT` 状态。 
+第二个报文 —— SYN + ACK 报文
 
 ![第二个报文 —— SYN + ACK 报文](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzE2LmpwZw?x-oss-process=image/format,png)
 
-- 服务端收到客户端的 `SYN` 报文后，首先服务端也随机初始化自己的序号（`server_isn`），将此序号填入 TCP 首部的「序号」字段中，其次把 TCP 首部的「确认应答号」字段填入 `client_isn + 1`, 接着把 `SYN` 和 `ACK` 标志位置为 `1`。最后把该报文发给客户端，该报文也不包含应用层数据，之后服务端处于 `SYN-RCVD` 状态。
+第三个报文 —— ACK 报文
 
 ![第三个报文 —— ACK 报文](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzE3LmpwZw?x-oss-process=image/format,png)
 
-- 客户端收到服务端报文后，还要向服务端回应最后一个应答报文，首先该应答报文 TCP 首部 `ACK` 标志位置为 `1` ，其次「确认应答号」字段填入 `server_isn + 1` ，最后把报文发送给服务端，这次报文可以携带客户到服务端的数据，之后客户端处于 `ESTABLISHED` 状态。
+</details>
 
-- 服务端收到客户端的应答报文后，也进入 `ESTABLISHED` 状态。
 
-从上面的过程可以发现**第三次握手是可以携带数据的，前两次握手是不可以携带数据的**，这也是面试常问的题。
 
-一旦完成三次握手，双方都处于 `ESTABLISHED` 状态，此时连接就已建立完成，客户端和服务端就可以相互发送数据了。
 
-### 如何在 Linux 系统中查看 TCP 状态？
 
-TCP 的连接状态查看，在 Linux 可以通过 `netstat -napt` 命令查看。
+### 如何在 Linux/Windows 系统中查看 TCP 状态？
+
+在 Linux 可以通过 `netstat -antp` 命令查看。  
+-a 显示所有连接和监听端口，-n 以数字形式显示地址和端口号，-t 仅显示 TCP 连接，-p 显示进程信息（需要 root 权限）
+
+在 Windows 中通过 `netstat -ano | findstr TCP` 命令查看。  
+-a 显示所有连接和监听端口，-n 以数字形式显示地址和端口号，-o 显示每个连接对应的进程 ID（PID），findstr 来筛选 TCP 关键字
 
 ![TCP 连接状态查看](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzE4LmpwZw?x-oss-process=image/format,png)
 
 ### 为什么是三次握手？不是两次、四次？
+
+第一次握手：Client 什么都不能确认；Server 确认了对方发送正常，自己接收正常  
+第二次握手：Client 确认了：自己发送、接收正常，对方发送、接收正常；Server 确认了：对方发送正常，自己接收正常  
+第三次握手：Client 确认了：自己发送、接收正常，对方发送、接收正常；Server 确认了：自己发送、接收正常，对方发送、接收正常
+
+三次握手就能确认双方收发功能都正常
+
+<details>
+<summary>复杂版</summary>
 
 相信大家比较常回答的是：“因为三次握手才能保证双方具有接收和发送的能力。”
 
@@ -388,6 +413,7 @@ TCP 建立连接时，通过三次握手**能防止历史连接的建立，能�
 
 - 「两次握手」：无法防止历史连接的建立，会造成双方资源的浪费，也无法可靠的同步双方序列号；
 - 「四次握手」：三次握手就已经理论上最少可靠连接建立，所以不需要使用更多的通信次数。
+</details>
 
 ### 为什么每次建立 TCP 连接时，初始化的序列号都要求不一样呢？
 
@@ -398,25 +424,11 @@ TCP 建立连接时，通过三次握手**能防止历史连接的建立，能�
 
 接下来，详细说说第一点。
 
-假设每次建立连接，客户端和服务端的初始化序列号都是从 0 开始：
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/isn相同.png)
-
-过程如下：
-
-- 客户端和服务端建立一个 TCP 连接，在客户端发送数据包被网络阻塞了，然后超时重传了这个数据包，而此时服务端设备断电重启了，之前与客户端建立的连接就消失了，于是在收到客户端的数据包的时候就会发送 RST 报文。
-- 紧接着，客户端又与服务端建立了与上一个连接相同四元组的连接；
+- 客户端向服务端发送一个数据包，被网络阻塞了，然后超时重传了这个数据包，而此时服务端设备断电重启了
 - 在新连接建立完成后，上一个连接中被网络阻塞的数据包正好抵达了服务端，刚好该数据包的序列号正好是在服务端的接收窗口内，所以该数据包会被服务端正常接收，就会造成数据错乱。
 
-可以看到，**如果每次建立连接，客户端和服务端的初始化序列号都是一样的话，很容易出现历史报文被下一个相同四元组的连接接收的问题**。
 
-如果每次建立连接客户端和服务端的初始化序列号都「不一样」，就有大概率因为历史报文的序列号「不在」对方接收窗口，从而很大程度上避免了历史报文，比如下图：
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/isn不相同.png)
-
-相反，如果每次建立连接客户端和服务端的初始化序列号都「一样」，就有大概率遇到历史报文的序列号刚「好在」对方的接收窗口内，从而导致历史报文被新连接成功接收。
-
-所以，每次初始化序列号不一样很大程度上能够避免历史报文被下一个相同四元组的连接接收，注意是很大程度上，并不是完全避免了（因为序列号会有回绕的问题，所以需要用时间戳的机制来判断历史报文，详细看篇：[TCP 是如何避免历史报文的？](https://xiaolincoding.com/network/3_tcp/isn_deff.html)）。
+>所以，每次初始化序列号不一样很大程度上能够避免历史报文被下一个相同四元组的连接接收，注意是很大程度上，并不是完全避免了（因为序列号会有回绕的问题，所以需要用时间戳的机制来判断历史报文，详细看篇：[TCP 是如何避免历史报文的？](https://xiaolincoding.com/network/3_tcp/isn_deff.html)）。
 
 ### 初始序列号 ISN 是如何随机产生的？
 
@@ -427,9 +439,10 @@ RFC793 提到初始化序列号 ISN 随机生成算法：ISN = M + F(localhost, 
 - `M` 是一个计时器，这个计时器每隔 4 微秒加 1。
 - `F` 是一个 Hash 算法，根据源 IP、目的 IP、源端口、目的端口生成一个随机数值。要保证 Hash 算法不能被外部轻易推算得出，用 MD5 算法是一个比较好的选择。
 
+- 紧接着，客户端又与服务端建立了与上
 可以看到，随机数是会基于时钟计时器递增的，基本不可能会随机成一样的初始化序列号。
 
-### 既然 IP 层会分片，为什么 TCP 层还需要 MSS 呢？
+### [Todo] 既然 IP 层会分片，为什么 TCP 层还需要 MSS 呢？
 
 我们先来认识下 MTU 和 MSS
 
@@ -458,88 +471,39 @@ RFC793 提到初始化序列号 ISN 随机生成算法：ISN = M + F(localhost, 
 
 ### 第一次握手丢失了，会发生什么？
 
-当客户端想和服务端建立 TCP 连接的时候，首先第一个发的就是 SYN 报文，然后进入到 `SYN_SENT` 状态。
+客户端重传 SYN 报文，若达到最大重传次数，于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到服务端的第二次握手（SYN-ACK 报文），那么客户端就会断开连接。
 
-在这之后，如果客户端迟迟收不到服务端的 SYN-ACK 报文（第二次握手），就会触发「超时重传」机制，重传 SYN 报文，而且**重传的 SYN 报文的序列号都是一样的**。
-
-不同版本的操作系统可能超时时间不同，有的 1 秒的，也有 3 秒的，这个超时时间是写死在内核里的，如果想要更改则需要重新编译内核，比较麻烦。
-
-当客户端在 1 秒后没收到服务端的 SYN-ACK 报文后，客户端就会重发 SYN 报文，那到底重发几次呢？
-
-在 Linux 里，客户端的 SYN 报文最大重传次数由 `tcp_syn_retries`内核参数控制，这个参数是可以自定义的，默认值一般是 5。
-
+>在 Linux 里，客户端的 SYN 报文最大重传次数由 `tcp_syn_retries`内核参数控制，这个参数是可以自定义的，默认值一般是 5。  
 ```shell
 # cat /proc/sys/net/ipv4/tcp_syn_retries
 5
 ```
 
-通常，第一次超时重传是在 1 秒后，第二次超时重传是在 2 秒，第三次超时重传是在 4 秒后，第四次超时重传是在 8 秒后，第五次是在超时重传 16 秒后。没错，**每次超时的时间是上一次的 2 倍**。
-
-当第五次超时重传后，会继续等待 32 秒，如果服务端仍然没有回应 ACK，客户端就不再发送 SYN 包，然后断开 TCP 连接。
-
-所以，总耗时是 1+2+4+8+16+32=63 秒，大约 1 分钟左右。
-
-举个例子，假设 tcp_syn_retries 参数值为 3，那么当客户端的 SYN 报文一直在网络中丢失时，会发生下图的过程：
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第1次握手丢失.png)
-
-具体过程：
-
-- 当客户端超时重传 3 次 SYN 报文后，由于  tcp_syn_retries 为 3，已达到最大重传次数，于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到服务端的第二次握手（SYN-ACK 报文），那么客户端就会断开连接。
-
 ### 第二次握手丢失了，会发生什么？
-
-当服务端收到客户端的第一次握手后，就会回 SYN-ACK 报文给客户端，这个就是第二次握手，此时服务端会进入 `SYN_RCVD` 状态。
 
 第二次握手的 `SYN-ACK` 报文其实有两个目的：
 
 - 第二次握手里的 ACK，是对第一次握手的确认报文；
 - 第二次握手里的 SYN，是服务端发起建立 TCP 连接的报文；
 
-所以，如果第二次握手丢了，就会发生比较有意思的事情，具体会怎么样呢？
-
-因为第二次握手报文里是包含对客户端的第一次握手的 ACK 确认报文，所以，如果客户端迟迟没有收到第二次握手，那么客户端就觉得可能自己的 SYN 报文（第一次握手）丢失了，于是**客户端就会触发超时重传机制，重传 SYN 报文**。
-
-然后，因为第二次握手中包含服务端的 SYN 报文，所以当客户端收到后，需要给服务端发送 ACK 确认报文（第三次握手），服务端才会认为该 SYN 报文被客户端收到了。
-
-那么，如果第二次握手丢失了，服务端就收不到第三次握手，于是**服务端这边会触发超时重传机制，重传 SYN-ACK 报文**。
-
-在 Linux 下，SYN-ACK 报文的最大重传次数由 `tcp_synack_retries`内核参数决定，默认值是 5。
-
-```shell
-# cat /proc/sys/net/ipv4/tcp_synack_retries
-5
-```
-
-因此，当第二次握手丢失了，客户端和服务端都会重传：
+所以，如果第二次握手丢了，客户端和服务端都会重传
 
 - 客户端会重传 SYN 报文，也就是第一次握手，最大重传次数由 `tcp_syn_retries`内核参数决定；
 - 服务端会重传 SYN-ACK 报文，也就是第二次握手，最大重传次数由 `tcp_synack_retries` 内核参数决定。
 
-举个例子，假设 tcp_syn_retries  参数值为 1，tcp_synack_retries 参数值为 2，那么当第二次握手一直丢失时，发生的过程如下图：
+那么，如果第二次握手丢失了，服务端就收不到第三次握手，于是**服务端这边会触发超时重传机制，重传 SYN-ACK 报文**。
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第2次握手丢失.png)
-
-具体过程：
-
-- 当客户端超时重传 1 次 SYN 报文后，由于  tcp_syn_retries 为 1，已达到最大重传次数，于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到服务端的第二次握手（SYN-ACK 报文），那么客户端就会断开连接。
-- 当服务端超时重传 2 次 SYN-ACK 报文后，由于 tcp_synack_retries 为 2，已达到最大重传次数，于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到客户端的第三次握手（ACK 报文），那么服务端就会断开连接。
+>在 Linux 下，SYN-ACK 报文的最大重传次数由 `tcp_synack_retries`内核参数决定，默认值是 5。
+```shell
+# cat /proc/sys/net/ipv4/tcp_synack_retries
+5
+```
 
 ### 第三次握手丢失了，会发生什么？
 
 客户端收到服务端的 SYN-ACK 报文后，就会给服务端回一个 ACK 报文，也就是第三次握手，此时客户端状态进入到 `ESTABLISH` 状态。
 
 因为这个第三次握手的 ACK 是对第二次握手的 SYN 的确认报文，所以当第三次握手丢失了，如果服务端那一方迟迟收不到这个确认报文，就会触发超时重传机制，重传 SYN-ACK 报文，直到收到第三次握手，或者达到最大重传次数。
-
-注意，**ACK 报文是不会有重传的，当 ACK 丢失了，就由对方重传对应的报文**。
-
-举个例子，假设 tcp_synack_retries 参数值为 2，那么当第三次握手一直丢失时，发生的过程如下图：
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第三次握手丢失.drawio.png)
-
-具体过程：
-
-- 当服务端超时重传 2 次 SYN-ACK 报文后，由于 tcp_synack_retries 为 2，已达到最大重传次数，于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到客户端的第三次握手（ACK 报文），那么服务端就会断开连接。
 
 ### 什么是 SYN 攻击？如何避免 SYN 攻击？
 
@@ -637,22 +601,17 @@ $ echo 2 > /proc/sys/net/ipv4/tcp_synack_retries
 
 ### TCP 四次挥手过程是怎样的？
 
-天下没有不散的宴席，对于 TCP 连接也是这样，TCP 断开连接是通过**四次挥手**方式。
-
 双方都可以主动断开连接，断开连接后主机中的「资源」将被释放，四次挥手的过程如下图：
 
-![客户端主动关闭连接 —— TCP 四次挥手](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzMwLmpwZw?x-oss-process=image/format,png)
+| 次数  | 发送方          | 主要字段           | 说明        | 客户端状态        | 服务端状态       |
+| --- | ------------ | -------------- | --------- | ------------ | ----------- |
+| 第一次 | 客户端   | FIN=1, Seq=x   | 客户端请求断开连接 | FIN\_WAIT\_1 | ESTABLISHED |
+| 第二次 | 服务端   | ACK=1, Ack=x+1 | 确认断开请求    | FIN\_WAIT\_2 | CLOSE\_WAIT |
+| 第三次 | 服务端   | FIN=1, Seq=y   | 服务端请求断开   | FIN\_WAIT\_2 | LAST\_ACK   |
+| 第四次 | 客户端   | ACK=1, Ack=y+1 | 客户端确认断开   | TIME\_WAIT (2MSL后CLOSE)   | CLOSE      |
 
 
-- 客户端打算关闭连接，此时会发送一个 TCP 首部 `FIN` 标志位被置为 `1` 的报文，也即 `FIN` 报文，之后客户端进入 `FIN_WAIT_1` 状态。
-- 服务端收到该报文后，就向客户端发送 `ACK` 应答报文，接着服务端进入 `CLOSE_WAIT` 状态。
-- 客户端收到服务端的 `ACK` 应答报文后，之后进入 `FIN_WAIT_2` 状态。
-- 等待服务端处理完数据后，也向客户端发送 `FIN` 报文，之后服务端进入 `LAST_ACK` 状态。
-- 客户端收到服务端的 `FIN` 报文后，回一个 `ACK` 应答报文，之后进入 `TIME_WAIT` 状态
-- 服务端收到了 `ACK` 应答报文后，就进入了 `CLOSE` 状态，至此服务端已经完成连接的关闭。
-- 客户端在经过 `2MSL` 一段时间后，自动进入 `CLOSE` 状态，至此客户端也完成连接的关闭。
-
-你可以看到，每个方向都需要**一个 FIN 和一个 ACK**，因此通常被称为**四次挥手**。
+<img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL3hpYW9saW5jb2Rlci9JbWFnZUhvc3QyLyVFOCVBRSVBMSVFNyVBRSU5NyVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5Qy9UQ1AtJUU0JUI4JTg5JUU2JUFDJUExJUU2JThGJUExJUU2JTg5JThCJUU1JTkyJThDJUU1JTlCJTlCJUU2JUFDJUExJUU2JThDJUE1JUU2JTg5JThCLzMwLmpwZw?x-oss-process=image/format,png" width=450>
 
 这里一点需要注意是：**主动关闭连接的，才有 TIME_WAIT 状态。**
 
@@ -665,53 +624,27 @@ $ echo 2 > /proc/sys/net/ipv4/tcp_synack_retries
 
 从上面过程可知，服务端通常需要等待完成数据的发送和处理，所以服务端的 `ACK` 和 `FIN` 一般都会分开发送，因此是需要四次挥手。
 
-但是**在特定情况下，四次挥手是可以变成三次挥手的**，具体情况可以看这篇：[TCP 四次挥手，可以变成三次吗？](https://xiaolincoding.com/network/3_tcp/tcp_three_fin.html)
+>但是**在特定情况下，四次挥手是可以变成三次挥手的**，具体情况可以看这篇：[TCP 四次挥手，可以变成三次吗？](https://xiaolincoding.com/network/3_tcp/tcp_three_fin.html)
 
 ### 第一次挥手丢失了，会发生什么？
 
-当客户端（主动关闭方）调用 close 函数后，就会向服务端发送 FIN 报文，试图与服务端断开连接，此时客户端的连接进入到 `FIN_WAIT_1` 状态。
-
-正常情况下，如果能及时收到服务端（被动关闭方）的 ACK，则会很快变为 `FIN_WAIT2`状态。
-
-如果第一次挥手丢失了，那么客户端迟迟收不到被动方的 ACK 的话，也就会触发超时重传机制，重传 FIN 报文，重发次数由 `tcp_orphan_retries` 参数控制。
-
-当客户端重传 FIN 报文的次数超过 `tcp_orphan_retries` 后，就不再发送 FIN 报文，则会在等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到第二次挥手，那么直接进入到 `close` 状态。
-
-举个例子，假设 tcp_orphan_retries 参数值为 3，当第一次挥手一直丢失时，发生的过程如下图：
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第一次挥手丢失.png)
-
-具体过程：
-
-- 当客户端超时重传 3 次 FIN 报文后，由于 tcp_orphan_retries 为 3，已达到最大重传次数，于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到服务端的第二次挥手（ACK 报文），那么客户端就会断开连接。
+客户端超时重传 FIN 报文，若重传次数上限（`tcp_orphan_retries`），于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到服务端的第二次挥手（ACK 报文），那么客户端就会断开连接。
 
 ### 第二次挥手丢失了，会发生什么？
 
-当服务端收到客户端的第一次挥手后，就会先回一个 ACK 确认报文，此时服务端的连接进入到 `CLOSE_WAIT` 状态。
-
-在前面我们也提了，ACK 报文是不会重传的，所以如果服务端的第二次挥手丢失了，客户端就会触发超时重传机制，重传 FIN 报文，直到收到服务端的第二次挥手，或者达到最大的重传次数。
-
-举个例子，假设 tcp_orphan_retries 参数值为 2，当第二次挥手一直丢失时，发生的过程如下图：
-
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第二次挥手丢失.png)
-
-具体过程：
-
-- 当客户端超时重传 2 次 FIN 报文后，由于 tcp_orphan_retries 为 2，已达到最大重传次数，于是再等待一段时间（时间为上一次超时时间的 2 倍），如果还是没能收到服务端的第二次挥手（ACK 报文），那么客户端就会断开连接。
-
-这里提一下，当客户端收到第二次挥手，也就是收到服务端发送的 ACK 报文后，客户端就会处于 `FIN_WAIT2` 状态，在这个状态需要等服务端发送第三次挥手，也就是服务端的 FIN 报文。
+因为 ACK 报文是不会重传的，所以如果服务端的第二次挥手丢失了，客户端就会触发超时重传机制，重传 FIN 报文，直到收到服务端的第二次挥手，或者达到最大的重传次数。
 
 对于 close 函数关闭的连接，由于无法再发送和接收数据，所以`FIN_WAIT2` 状态不可以持续太久，而 `tcp_fin_timeout` 控制了这个状态下连接的持续时长，默认值是 60 秒。
 
-这意味着对于调用 close 关闭的连接，如果在 60 秒后还没有收到 FIN 报文，客户端（主动关闭方）的连接就会直接关闭，如下图：
+这意味着对于调用 close 函数 关闭的连接，如果在 60 秒后还没有收到 FIN 报文，客户端（主动关闭方）的连接就会直接关闭，如下图：
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/fin_wait_2.drawio.png)
+<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/fin_wait_2.drawio.png" width=560>
 
 但是注意，如果主动关闭方使用 shutdown 函数关闭连接，指定了只关闭发送方向，而接收方向并没有关闭，那么意味着主动关闭方还是可以接收数据的。
 
 此时，如果主动关闭方一直没收到第三次挥手，那么主动关闭方的连接将会一直处于 `FIN_WAIT2` 状态（`tcp_fin_timeout` 无法控制 shutdown 关闭的连接）。如下图：
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/fin_wait_2死等.drawio.png)
+<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/fin_wait_2死等.drawio.png" width=560>
 
 ### 第三次挥手丢失了，会发生什么？
 
@@ -725,7 +658,7 @@ $ echo 2 > /proc/sys/net/ipv4/tcp_synack_retries
 
 举个例子，假设 `tcp_orphan_retries` = 3，当第三次挥手一直丢失时，发生的过程如下图：
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第三次挥手丢失.drawio.png)
+<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第三次挥手丢失.drawio.png" width=560>
 
 具体过程：
 
@@ -744,7 +677,7 @@ $ echo 2 > /proc/sys/net/ipv4/tcp_synack_retries
 
 举个例子，假设 tcp_orphan_retries 为 2，当第四次挥手一直丢失时，发生的过程如下：
 
-![](https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第四次挥手丢失drawio.drawio.png)
+<img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/第四次挥手丢失drawio.drawio.png" width=560>
 
 具体过程：
 
